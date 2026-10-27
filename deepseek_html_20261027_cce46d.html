@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Desktop Clone - Fixed Avatars</title>
+    <style>
+        /* Общие стили */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fafafa;
+            color: #262626;
+            font-size: 14px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #00376b;
+            font-weight: 600;
+        }
+
+        /* --- Верхняя навигация (Header) --- */
+        .top-nav {
+            background-color: #fff;
+            border-bottom: 1px solid #dbdbdb;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .top-nav-content {
+            width: 100%;
+            max-width: 975px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Brush Script MT', cursive;
+            font-size: 24px;
+        }
+
+        .search-bar {
+            background-color: #efefef;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 6px 12px;
+            width: 250px;
+            color: #8e8e8e;
+            text-align: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-login {
+            background-color: #0095f6;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-signup {
+            color: #0095f6;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* --- Основной контент --- */
+        .main-container {
+            max-width: 935px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Шапка профиля */
+        .profile-header {
+            display: flex;
+            margin-bottom: 44px;
+        }
+
+        .profile-avatar-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-right: 30px;
+        }
+
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 1px solid #dbdbdb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 0 4px #fff, 0 0 0 5px #dbdbdb;
+        }
+
+        .avatar-logo {
+            font-size: 60px;
+            font-weight: bold;
+            color: #3b5998;
+            letter-spacing: -5px;
+            font-family: Arial, sans-serif;
+        }
+
+        .avatar-logo span {
+            color: #ff7eb3;
+            margin-left: -10px;
+        }
+
+        .profile-info {
+            flex: 2;
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-username {
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        .btn-follow {
+            background-color: #0095f6;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .profile-stats span {
+            font-weight: 600;
+        }
+
+        .profile-bio {
+            line-height: 1.5;
+        }
+
+        .profile-bio h3 {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        /* --- Табы --- */
+        .tabs-container {
+            border-top: 1px solid #dbdbdb;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+        }
+
+        .tab {
+            color: #8e8e8e;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            padding: 18px 0;
+            transition: color 0.2s;
+        }
+
+        .tab.active {
+            color: #262626;
+        }
+
+        .tab svg {
+            fill: currentColor;
+        }
+
+        .tab-indicator {
+            position: absolute;
+            top: -1px;
+            height: 1px;
+            background-color: #262626;
+            transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+
+        /* --- Контейнер для свайпа и сетка --- */
+        .grid-wrapper {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .sliding-container {
+            display: flex;
+            width: 200%;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .tab-content {
+            width: 50%;
+            flex-shrink: 0;
+            padding-right: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+        }
+
+        .grid-item {
+            aspect-ratio: 1 / 1;
+            background-color: #efefef;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #b0b0b0;
+        }
+
+        .grid-item:hover::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .grid-item svg {
+            width: 60px;
+            height: 60px;
+            fill: #ccc;
+        }
+
+        /* =========================================
+           МОДАЛЬНОЕ ОКНО (ПОСТ) - ИСПРАВЛЕННЫЕ АВАТАРКИ
+           ========================================= */
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.65);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        /* Стрелки навигации */
+        .nav-arrow {
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            user-select: none;
+            opacity: 0.8;
+        }
+        .nav-arrow:hover { opacity: 1; }
+        .nav-arrow.left { left: 20px; }
+        .nav-arrow.right { right: 20px; }
+
+        /* Контейнер поста */
+        .post-container {
+            background-color: #fff;
+            width: 900px;
+            height: 600px;
+            display: flex;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Левая часть (Фото) */
+        .post-image-side {
+            flex: 1.4;
+            background-color: #aebcd0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Правая часть (Инфо) */
+        .post-info-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+        }
+
+        /* Шапка поста */
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #efefef;
+            gap: 12px;
+        }
+
+        /* ИСПРАВЛЕНИЕ: Идеально круглая иконка пользователя */
+        .user-avatar-icon {
+            width: 32px;
+            height: 32px;
+            min-width: 32px; /* Запрещаем сжиматься */
+            min-height: 32px;
+            border-radius: 50%; /* Идеальный круг */
+            background-color: #dbdbdb; /* Серый фон */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #8e8e8e; /* Цвет человечка внутри */
+            flex-shrink: 0; /* Не позволяем флексу сплющивать */
+        }
+
+        /* Настраиваем размер SVG внутри аватарки */
+        .user-avatar-icon svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+        }
+
+        .post-header-username {
+            font-weight: 600;
+            font-size: 14px;
+            flex-grow: 1;
+            color: #262626;
+        }
+
+        .header-menu-dots {
+            color: #262626;
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        /* Комментарии */
+        .post-comments {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .comment {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .comment-content {
+            flex-grow: 1;
+        }
+
+        .comment-username {
+            font-weight: 600;
+            margin-right: 5px;
+            color: #262626;
+        }
+
+        .comment-text {
+            color: #262626;
+        }
+
+        .comment-text .tag {
+            color: #00376b;
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: #8e8e8e;
+            margin-top: 4px;
+        }
+
+        .comment-close {
+            color: #8e8e8e;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 5px;
+        }
+
+        /* Блок действий */
+        .post-actions {
+            padding: 0 20px 15px 20px;
+            background-color: #fff;
+        }
+
+        .action-icons-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            margin-top: 10px;
+        }
+
+        .action-icons-left {
+            display: flex;
+            gap: 16px;
+        }
+
+        .action-icons-row svg {
+            width: 24px;
+            height: 24px;
+            stroke: #262626;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            cursor: default;
+        }
+
+        .action-icons-row svg.heart {
+            fill: #ed4956;
+            stroke: #ed4956;
+        }
+
+        .likes-count {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .post-date {
+            color: #8e8e8e;
+            font-size: 12px;
+        }
+
+        /* Поле ввода */
+        .add-comment {
+            padding: 16px 20px;
+            border-top: 1px solid #efefef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #8e8e8e;
+            font-size: 14px;
+            cursor: not-allowed;
+        }
+
+        .post-btn {
+            color: #0095f6;
+            font-weight: 600;
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        /* Скроллбар */
+        .post-comments::-webkit-scrollbar {
+            width: 6px;
+        }
+        .post-comments::-webkit-scrollbar-thumb {
+            background-color: #dbdbdb;
+            border-radius: 3px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Шапка сайта -->
+    <header class="top-nav">
+        <div class="top-nav-content">
+            <div class="logo-area">
+                <svg aria-label="Instagram" fill="#262626" height="29" viewBox="0 0 48 48" width="29"><path d="M24 4.6c5.3 0 5.9 0 8 .1 1.9.1 3 .4 3.7.7.9.4 1.6.8 2.3 1.5.7.7 1.1 1.4 1.5 2.3.3.7.6 1.8.7 3.7.1 2.1.1 2.7.1 8s0 5.9-.1 8c-.1 1.9-.4 3-.7 3.7-.4.9-.8 1.6-1.5 2.3-.7.7-1.4 1.1-2.3 1.5-.7.3-1.8.6-3.7.7-2.1.1-2.7.1-8 .1s-5.9 0-8-.1c-1.9-.1-3-.4-3.7-.7-.9-.4-1.6-.8-2.3-1.5-.7-.7-1.1-1.4-1.5-2.3-.3-.7-.6-1.8-.7-3.7-.1-2.1-.1-2.7-.1-8s0-5.9.1-8c.1-1.9.4-3 .7-3.7.4-.9.8-1.6 1.5-2.3.7-.7 1.4-1.1 2.3-1.5.7-.3 1.8-.6 3.7-.7 2.1-.1 2.7-.1 8-.1zm0-4.6C18.6 0 17.9 0 15.8.1 13.6.2 12.1.5 10.8 1c-1.3.5-2.4 1.2-3.5 2.3C6.2 4.4 5.5 5.5 5 6.8c-.5 1.3-.8 2.8-.9 5C4 13.9 4 14.6 4 20s0 6.1.1 8.2c.1 2.2.4 3.7.9 5 .5 1.3 1.2 2.4 2.3 3.5 1.1 1.1 2.2 1.8 3.5 2.3 1.3.5 2.8.8 5 .9 2.1.1 2.8.1 8.2.1s6.1 0 8.2-.1c2.2-.1 3.7-.4 5-.9 1.3-.5 2.4-1.2 3.5-2.3 1.1-1.1 1.8-2.2 2.3-3.5.5-1.3.8-2.8.9-5 .1-2.1.1-2.8.1-8.2s0-6.1-.1-8.2c-.1-2.2-.4-3.7-.9-5-.5-1.3-1.2-2.4-2.3-3.5-1.1-1.1-2.2-1.8-3.5-2.3-1.3-.5-2.8-.8-5-.9C29.9 0 29.2 0 24 0zM24 11.6c-6.8 0-12.4 5.6-12.4 12.4S17.2 36.4 24 36.4 36.4 30.8 36.4 24 30.8 11.6 24 11.6zm0 20.5c-4.5 0-8.1-3.6-8.1-8.1s3.6-8.1 8.1-8.1 8.1 3.6 8.1 8.1-3.6 8.1-8.1 8.1zM37.4 10.8c0 1.6-1.3 2.9-2.9 2.9s-2.9-1.3-2.9-2.9 1.3-2.9 2.9-2.9 2.9 1.3 2.9 2.9z"></path></svg>
+                <span>Instagram</span>
+            </div>
+            <div class="search-bar">Поиск</div>
+            <div class="nav-buttons">
+                <button class="btn-login">Вход</button>
+                <span class="btn-signup">Регистрация</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <main class="main-container">
+        <!-- Шапка профиля -->
+        <div class="profile-header">
+            <div class="profile-avatar-container">
+                <div class="avatar">
+                    <div class="avatar-logo">m<span>m</span></div>
+                </div>
+            </div>
+            <div class="profile-info">
+                <div class="profile-top">
+                    <h1 class="profile-username">mediamodifier</h1>
+                    <button class="btn-follow">Подписаться</button>
+                </div>
+                <div class="profile-stats">
+                    <div><span>35</span> публикаций</div>
+                    <div><span>41</span> подписчик</div>
+                    <div><span>27</span> подписок</div>
+                </div>
+                <div class="profile-bio">
+                    <h3>Mediamodifier</h3>
+                    <p>Mediamodifier is a drag-and-drop design app for turning your flat</p>
+                    <p>product images into awesome marketing visuals.</p>
+                    <a href="#" style="color: #00376b;">mediamodifier.com</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Табы -->
+        <div class="tabs-container">
+            <div class="tab-indicator" id="tabIndicator"></div>
+            <div class="tabs">
+                <div class="tab active" id="tab-posts" onclick="switchTab(0)">
+                    <svg width="12" height="12" viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h2v2H7V7zm0 4h2v2H7v-2zm0 4h2v2H7v-2zm4-8h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-8h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2z"/></svg>
+                    ПУБЛИКАЦИИ
+                </div>
+                <div class="tab" id="tab-tagged" onclick="switchTab(1)">
+                    <svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
+                    ОТМЕТКИ
+                </div>
+            </div>
+        </div>
+
+        <!-- Контейнер со свайпом -->
+        <div class="grid-wrapper">
+            <div class="sliding-container" id="slidingContainer">
+                
+                <!-- Вкладка 1: Публикации (6 постов) -->
+                <div class="tab-content">
+                    <div class="grid">
+                        <div class="grid-item" onclick="openPost()">
+                            <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM9 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/></svg>
+                        </div>
+                        <div class="grid-item" onclick="openPost()">
+                            <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM9 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/></svg>
+                        </div>
+                        <div class="grid-item" onclick="openPost()">
+                            <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM9 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/></svg>
+                        </div>
+                        <div class="grid-item" onclick="openPost()">
+                            <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM9 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/></svg>
+                        </div>
+                        <div class="grid-item" onclick="openPost()">
+                            <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM9 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/></svg>
+                        </div>
+                        <div class="grid-item" onclick="openPost()">
+                            <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM9 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка 2: Отметки (3 поста) -->
+                <div class="tab-content">
+                    <div class="grid">
+                        <div class="grid-item" onclick="openPost()">
+                            <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM9 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/></svg>
+                        </div>
+                        <div class="grid-item" onclick="openPost()">
+                            <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM9 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/></svg>
+                        </div>
+                        <div class="grid-item" onclick="openPost()">
+                            <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM9 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Модальное окно -->
+    <div class="modal-overlay" id="postModal" onclick="closePost(event)">
+        <div class="nav-arrow left">‹</div>
+        <div class="nav-arrow right">›</div>
+        
+        <div class="post-container" onclick="event.stopPropagation()">
+            
+            <!-- Левая часть: Фото -->
+            <div class="post-image-side"></div>
+
+            <!-- Правая часть: Информация -->
+            <div class="post-info-side">
+                
+                <!-- Шапка поста -->
+                <div class="post-header">
+                    <div class="user-avatar-icon">
+                        <!-- Иконка человечка -->
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    <div class="post-header-username">User Name</div>
+                    <div class="header-menu-dots">...</div>
+                </div>
+
+                <!-- Комментарии -->
+                <div class="post-comments">
+                    
+                    <!-- Комментарий 1 -->
+                    <div class="comment">
+                        <div class="user-avatar-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="comment-content">
+                            <span class="comment-username">User Name</span>
+                            <span class="comment-text">Insert your post caption or description here. <span class="tag">#template</span></span>
+                            <div class="comment-time">5 days ago</div>
+                        </div>
+                    </div>
+
+                    <!-- Комментарий 2 -->
+                    <div class="comment">
+                        <div class="user-avatar-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="comment-content">
+                            <span class="comment-username">User Name</span>
+                            <span class="comment-text">Your comment here.</span>
+                            <div class="comment-time">42 likes &nbsp;&nbsp; Reply</div>
+                        </div>
+                        <div class="comment-close">×</div>
+                    </div>
+
+                </div>
+
+                <!-- Действия -->
+                <div class="post-actions">
+                    <div class="action-icons-row">
+                        <div class="action-icons-left">
+                            <svg class="heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </div>
+                        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    
+                    <div class="likes-count">9,211 likes</div>
+                    <div class="post-date">5 days ago</div>
+                </div>
+
+                <!-- Заблокированное поле ввода -->
+                <div class="add-comment">
+                    <span>Add a comment...</span>
+                    <span class="post-btn">Post</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Логика переключения вкладок и свайпа ---
+        const indicator = document.getElementById('tabIndicator');
+        const tabPosts = document.getElementById('tab-posts');
+        const tabTagged = document.getElementById('tab-tagged');
+        const slidingContainer = document.getElementById('slidingContainer');
+
+        window.onload = () => {
+            updateIndicator(tabPosts);
+        };
+
+        function updateIndicator(activeTab) {
+            const tabRect = activeTab.getBoundingClientRect();
+            const containerRect = activeTab.parentElement.getBoundingClientRect();
+            const leftOffset = tabRect.left - containerRect.left;
+            
+            indicator.style.width = `${tabRect.width}px`;
+            indicator.style.transform = `translateX(${leftOffset}px)`;
+        }
+
+        function switchTab(index) {
+            if (index === 0) {
+                tabPosts.classList.add('active');
+                tabTagged.classList.remove('active');
+                slidingContainer.style.transform = 'translateX(0%)';
+                updateIndicator(tabPosts);
+            } else {
+                tabTagged.classList.add('active');
+                tabPosts.classList.remove('active');
+                slidingContainer.style.transform = 'translateX(-50%)';
+                updateIndicator(tabTagged);
+            }
+        }
+
+        // --- Логика модального окна ---
+        function openPost() {
+            document.getElementById('postModal').classList.add('active');
+        }
+
+        function closePost(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                document.getElementById('postModal').classList.remove('active');
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                document.getElementById('postModal').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
